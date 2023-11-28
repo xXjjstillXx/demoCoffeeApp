@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 
-public interface FacturacionRepository extends JpaRepository<FacturacionModel,Integer> {
+public interface FacturacionRepository extends JpaRepository<FacturacionModel,Long> {
 
     @Override
-    Optional<FacturacionModel> findById(Integer id_ventas);
+    Optional<FacturacionModel> findById(Long id_ventas);
 }

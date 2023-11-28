@@ -9,7 +9,7 @@ import lombok.Data;
 public class DetallesFacturacionModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "facturacion_id")

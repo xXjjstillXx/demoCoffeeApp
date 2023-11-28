@@ -8,16 +8,16 @@ import lombok.ToString;
 @ToString
 @Data
 @Entity
-@Table(name = "ventas")
+@Table(name = "facturaciones")
 public class FacturacionModel {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "cliente_id")
     private ClienteModel cliente;
     @Column (name = "fecha_creacion")
     private Date fechaCreacion;
-    @Column (name = "valor_producto")
-    private double valorProducto;
+    @Column (name = "valor_total")
+    private double valorTotal;
 }
