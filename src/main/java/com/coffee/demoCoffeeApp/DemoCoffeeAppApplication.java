@@ -5,8 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.coffee.demoCoffeeApp.repository.ClienteRepository;
-import com.coffee.demoCoffeeApp.repository.DetallesFacturacionRepository;
-import com.coffee.demoCoffeeApp.repository.FacturacionRepository;
+import com.coffee.demoCoffeeApp.repository.ComprobanteRepository;
 import com.coffee.demoCoffeeApp.repository.ProductoRepository;
 
 @SpringBootApplication
@@ -16,10 +15,7 @@ public class DemoCoffeeAppApplication {
 	ClienteRepository clienteRepository;
 
 	@Autowired
-	DetallesFacturacionRepository detallesFacturacionRepository;
-
-	@Autowired
-	FacturacionRepository facturacionRepository;
+	ComprobanteRepository facturacionRepository;
 
 	@Autowired
  	ProductoRepository productosRepository;

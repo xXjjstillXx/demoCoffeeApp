@@ -17,16 +17,17 @@ CREATE TABLE `productos` (
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `facturaciones` (
+CREATE TABLE `comprobante` (
   `id` int NOT NULL AUTO_INCREMENT,
   `cliente_id` int NOT NULL,
+  `cantidad` int NOT NULL,
   `fecha_creacion` datetime NOT NULL,
   `valor_producto` double NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT fk_cliente_id FOREIGN KEY (cliente_id) REFERENCES clientes(id)
 );
 
-CREATE TABLE `detalles_facturaciones` (
+CREATE TABLE `linea` (
   `id` int NOT NULL AUTO_INCREMENT,
   `facturacion_id` int NOT NULL,
   `producto_id` int NOT NULL,

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coffee.demoCoffeeApp.exceptions.ProductoException;
 import com.coffee.demoCoffeeApp.model.ProductoModel;
 import com.coffee.demoCoffeeApp.services.ProductoService;
 
@@ -23,7 +24,7 @@ public class ProductoController {
     private ProductoService productoService;
 
     @PostMapping("/crear")
-    public ResponseEntity<ProductoModel> create (@RequestBody ProductoModel producto){
+    public ResponseEntity<String> create (@RequestBody ProductoModel producto) throws ProductoException{
         return new ResponseEntity<>(this.productoService.create(producto),HttpStatus.CREATED);
     }
     @GetMapping("/{id}")
@@ -31,3 +32,4 @@ public class ProductoController {
         return new ResponseEntity<>(this.productoService.findById(id),HttpStatus.OK);
     }
 }
+

@@ -19,4 +19,11 @@ public class ClienteModel {
     @Column 
     private boolean permisos;
 
+    public boolean getPermisos(){
+        return permisos;
+    }
+
+    public void setPermisos(boolean permisos){
+        this.permisos = permisos;
+    }
 }

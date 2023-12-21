@@ -1,5 +1,7 @@
 package com.coffee.demoCoffeeApp.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,6 +17,6 @@ public class ProductoModel {
     @Column 
     private int cantidad;
     @Column 
-    private double precio; 
+    private BigDecimal precio; 
     
 }
