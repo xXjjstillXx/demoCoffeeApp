@@ -3,11 +3,10 @@ package com.coffee.demoCoffeeApp.model;
 import java.math.BigDecimal;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
-@Data
 @Entity
 @Table(name = "linea")
+@NamedQuery(name="LineaModel.findAll", query="SELECT l FROM LineaModel l")
 public class LineaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,17 +29,71 @@ public class LineaModel {
     @JoinColumn(name = "producto_id")
     private ProductoModel producto;
 
-    @Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Linea [lineaid=").append(id).append(", cantidad=").append(cantidad).append(", ");
-		if (descripcion != null)
-			builder.append("descripcion=").append(descripcion).append(", ");
-		if (total != null)
-			builder.append("precio=").append(total);
-		builder.append("]");
-		return builder.toString();
-	}
+    public LineaModel(){
+
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    public ComprobanteModel getComprobante() {
+        return comprobante;
+    }
+
+    public void setComprobante(ComprobanteModel comprobante) {
+        this.comprobante = comprobante;
+    }
+
+    public ProductoModel getProducto() {
+        return producto;
+    }
+
+    public void setProducto(ProductoModel producto) {
+        this.producto = producto;
+    }
+    
+
+
+    // @Override
+	// public String toString() {
+	// 	StringBuilder builder = new StringBuilder();
+	// 	builder.append("Linea [lineaid=").append(id).append(", cantidad=").append(cantidad).append(", ");
+	// 	if (descripcion != null)
+	// 		builder.append("descripcion=").append(descripcion).append(", ");
+	// 	if (total != null)
+	// 		builder.append("precio=").append(total);
+	// 	builder.append("]");
+	// 	return builder.toString();
+	// }
 
     
 

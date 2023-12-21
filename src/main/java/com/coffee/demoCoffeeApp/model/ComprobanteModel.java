@@ -5,13 +5,14 @@ import java.util.Date;
 import java.util.Set;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
 
-@ToString
-@Data
+
+
+
+
 @Entity
 @Table(name = "comprobante")
+@NamedQuery(name="ComprobanteModel.findAll", query="SELECT c FROM ComprobanteModel c")
 public class ComprobanteModel {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +35,97 @@ public class ComprobanteModel {
     @OneToMany(mappedBy="comprobante", fetch=FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<LineaModel> lineas;
 
-    public LineaModel addLinea(LineaModel linea) {
+	public ComprobanteModel() {
+	}
+
+	
+
+
+    public Long getId() {
+		return id;
+	}
+
+
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+
+
+	public Integer getCantidad() {
+		return cantidad;
+	}
+
+
+
+
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
+
+
+
+
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+
+
+
+
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+
+
+
+
+	public BigDecimal getValorTotal() {
+		return valorTotal;
+	}
+
+
+
+
+	public void setValorTotal(BigDecimal valorTotal) {
+		this.valorTotal = valorTotal;
+	}
+
+
+
+
+	public ClienteModel getCliente() {
+		return cliente;
+	}
+
+
+
+
+	public void setCliente(ClienteModel cliente) {
+		this.cliente = cliente;
+	}
+
+
+
+
+	public Set<LineaModel> getLineas() {
+		return lineas;
+	}
+
+
+
+
+	public void setLineas(Set<LineaModel> lineas) {
+		this.lineas = lineas;
+	}
+
+
+
+
+	public LineaModel addLinea(LineaModel linea) {
 		getLineas().add(linea);
 		linea.setComprobante(this);
 

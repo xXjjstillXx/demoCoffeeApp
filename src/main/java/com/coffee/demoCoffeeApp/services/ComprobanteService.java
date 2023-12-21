@@ -23,7 +23,6 @@ import com.coffee.demoCoffeeApp.model.WorldClock;
 import com.coffee.demoCoffeeApp.repository.ClienteRepository;
 import com.coffee.demoCoffeeApp.repository.ComprobanteRepository;
 import com.coffee.demoCoffeeApp.repository.ProductoRepository;
-import com.coffee.demoCoffeeApp.validators.ComprobanteValidator;
 
 @Service
 public class ComprobanteService {
@@ -37,7 +36,10 @@ public class ComprobanteService {
     @Autowired
     private RestTemplate restTemplate;
 
-    ComprobanteValidator comprobanteValidator = new ComprobanteValidator();
+
+    public List<ComprobanteDTO> findAll(){
+        return crearComprobantesDTO(this.comprobanteRepository.findAll());
+    }
 
     public ComprobanteDTO create(ComprobanteModel comprobante) {
         Boolean existeCliente = existeCliente(comprobante.getCliente());
@@ -58,9 +60,21 @@ public class ComprobanteService {
 		}
     }
 
-    public List<ComprobanteDTO> findAll(){
-        return crearComprobantesDTO(this.comprobanteRepository.findAll());
-    }
+    private void actualizarStock(Set<LineaModel> lineas) {
+		for (LineaModel linea : lineas) {
+			
+			var cantidadVendida = linea.getCantidad();
+			var producto = linea.getProducto();
+			
+			var productoDB = this.productoRepository.getReferenceById(producto.getId());
+			var stock = productoDB.getCantidad();
+			var nuevoStock = stock - cantidadVendida;
+			productoDB.setCantidad(nuevoStock);
+			
+			this.productoRepository.save(productoDB);
+		}
+		
+	}
 
      public ComprobanteDTO findById(Long id){
         var opCliente =  this.comprobanteRepository.findById(id);
@@ -69,10 +83,6 @@ public class ComprobanteService {
 		} else {
 			return new ComprobanteDTO();
 		}
-    }
-
-    public void delete(Long id){
-        this.comprobanteRepository.deleteById(id);
     }
 
     private List<ComprobanteDTO> crearComprobantesDTO(List<ComprobanteModel> comprobantes) {
@@ -124,6 +134,54 @@ public class ComprobanteService {
 		return dtos;
 	}
 
+    private ComprobanteModel armarComprobante(ComprobanteModel comprobante) {
+        var comprobanteAGuardar = new ComprobanteModel();
+        
+        comprobanteAGuardar.setCliente(this.clienteRepository.findById(comprobante.getCliente().getId()).get());
+        
+        WorldClock worldClock = this.restTemplate.getForObject("http://worldclockapi.com/api/json/utc/now", WorldClock.class);
+        String currentDateTime = worldClock.getCurrentDateTime();
+        try {
+            Date date1=new SimpleDateFormat("yyyy-MM-dd'T'mm:ss'Z'").parse(currentDateTime);
+            comprobanteAGuardar.setFechaCreacion(date1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            comprobanteAGuardar.setFechaCreacion(new Date());
+        } 
+        
+        comprobanteAGuardar.setLineas(new HashSet<LineaModel>());
+        for (LineaModel linea : comprobante.getLineas()) {
+            comprobanteAGuardar.addLinea(crearLinea(linea));
+        }
+
+		comprobanteAGuardar.setValorTotal(calcularTotal(comprobanteAGuardar.getLineas()));
+		comprobanteAGuardar.setCantidad(comprobante.getLineas().size());
+		
+		return comprobanteAGuardar;
+	}
+
+    private BigDecimal calcularTotal(Set<LineaModel> lineas) {
+		BigDecimal total = new BigDecimal("0");
+		
+		for (LineaModel linea : lineas) {
+			total = total.add(new BigDecimal(linea.getTotal().toString()));
+		}
+		
+		return total;
+	}
+
+    private LineaModel crearLinea(LineaModel linea) {
+		LineaModel lineaAGuardar = new LineaModel();
+		
+		ProductoModel productoDB = this.productoRepository.findById(linea.getProducto().getId()).get();
+		lineaAGuardar.setCantidad(linea.getCantidad());
+		lineaAGuardar.setDescripcion(productoDB.getDescripcion());
+		lineaAGuardar.setTotal(productoDB.getPrecio());
+		lineaAGuardar.setProducto(productoDB);
+		
+		return lineaAGuardar;
+	}
+
     private Boolean existeStock(Set<LineaModel> lineas) {
             for (LineaModel linea : lineas) {
                 var productoid = linea.getProducto().getId();
@@ -154,72 +212,8 @@ public class ComprobanteService {
         return !opCliente.isEmpty();
     }
 
-    private ComprobanteModel armarComprobante(ComprobanteModel comprobante) {
-        var comprobanteAGuardar = new ComprobanteModel();
-        
-        comprobanteAGuardar.setCliente(this.clienteRepository.findById(comprobante.getCliente().getId()).get());
-        
-        WorldClock worldClock = this.restTemplate.getForObject("http://worldclockapi.com/api/json/utc/now", WorldClock.class);
-        String currentDateTime = "2023-12-08";
-        if (worldClock != null) {
-            currentDateTime = worldClock.getCurrentDateTime();
-        }
-        try {
-            Date date1=new SimpleDateFormat("yyyy-MM-dd'T'mm:ss'Z'").parse(currentDateTime);
-            comprobanteAGuardar.setFechaCreacion(date1);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            comprobanteAGuardar.setFechaCreacion(new Date());
-        } 
-        
-        comprobanteAGuardar.setLineas(new HashSet<LineaModel>());
-        for (LineaModel linea : comprobante.getLineas()) {
-            comprobanteAGuardar.addLinea(crearLinea(linea));
-        }
-
-		comprobanteAGuardar.setValorTotal(calcularTotal(comprobanteAGuardar.getLineas()));
-		comprobanteAGuardar.setCantidad(comprobante.getLineas().size());
-		
-		return comprobanteAGuardar;
-	}
-
-    private BigDecimal calcularTotal(Set<LineaModel> lineas) {
-		BigDecimal total = new BigDecimal("0");
-		
-		for (LineaModel linea : lineas) {
-			total = total.add(new BigDecimal(linea.getTotal().toString()));
-		}
-		
-		return total;
-	}
-
-	private LineaModel crearLinea(LineaModel linea) {
-		LineaModel lineaAGuardar = new LineaModel();
-		
-		ProductoModel productoDB = this.productoRepository.findById(linea.getProducto().getId()).get();
-		lineaAGuardar.setCantidad(linea.getCantidad());
-		lineaAGuardar.setDescripcion(productoDB.getDescripcion());
-		lineaAGuardar.setTotal(productoDB.getPrecio());
-		lineaAGuardar.setProducto(productoDB);
-		
-		return lineaAGuardar;
-	}
-
-    private void actualizarStock(Set<LineaModel> lineas) {
-		for (LineaModel linea : lineas) {
-			
-			var cantidadVendida = linea.getCantidad();
-			var producto = linea.getProducto();
-			
-			var productoDB = this.productoRepository.getReferenceById(producto.getId());
-			var stock = productoDB.getCantidad();
-			var nuevoStock = stock - cantidadVendida;
-			productoDB.setCantidad(nuevoStock);
-			
-			this.productoRepository.save(productoDB);
-			
-		}
-		
-	}
+    public void delete(Long id){
+        this.comprobanteRepository.deleteById(id);
+    }
     
 }
